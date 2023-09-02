@@ -1,0 +1,92 @@
+                                <div class="rating">
+                                                                {% for i in "12345" %}
+                                                                <span class="star {% if i <= avg_rating %}active{% endif %}" data-value="{{ i }}"></span>
+                                                                {% endfor %}
+                  </div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('.star').on('click', function() {
+        var stars = $(this).data('value');
+        var bookId = $('#bookId').val();
+        $('.star').each(function(index, star) {
+            if (index < stars) {
+                $(star).addClass('active');
+            } else {
+                $(star).removeClass('active');
+            }
+        });
+
+        $.ajax({
+            url: '{% url "catalog:rate_book" %}',
+            method: 'POST',
+            data: {
+                'book_id': bookId,
+                'stars': stars,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                let avg_rating = response.avg_rating;
+                $('.star').each(function(index, star) {
+                    if (index < avg_rating) {
+                        $(star).css('border-color', 'red');
+                    } else {
+                        $(star).css('border-color', 'initial');
+                    }
+                });
+            },
+            error: function(response) {
+                // обработайте ошибку
+            }
+        });
+    });
+
+    $('.star').on('mouseover', function() {
+        var hoverStars = $(this).data('value');
+        $('.star').each(function(index, star) {
+            if (index < hoverStars) {
+                $(star).addClass('hover');
+            } else {
+                $(star).removeClass('hover');
+            }
+        });
+    });
+
+    $('.star').on('mouseout', function() {
+        $('.star').removeClass('hover');
+    });
+});
+
+</script>
+<style>
+.star {
+    /* ваш текущий код */
+    background-color: transparent;
+    transition: background-color 0.5s;
+}
+
+.star.active {
+    background-color: yellow;
+}
+.star::before {
+    content: "☆";
+    display: inline-block;
+    width: 25px;
+    height: 25px;
+    background-color: transparent;
+    transition: background-color 0.5s;
+}
+
+.star.active::before,
+.star.hover::before {
+    content: "★";
+    color: yellow;
+}
+
+</style>
+                                                         </div>
+                                                      </div>
+                                                   </div>
+                                                </div>
+
